@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import User from '../models/User.model';
-import { AppError, NotFoundError } from '../utils/errors';
+import { NotFoundError } from '../utils/errors';
 import asyncHandler from '../utils/asyncHandler';
 
 // Extend Express Request type to include user
@@ -25,7 +25,7 @@ export const getProfile = asyncHandler(async (req: IRequest, res: Response) => {
 // @desc    Get all users
 // @route   GET /api/users
 // @access  Admin
-export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+export const getAllUsers = asyncHandler(async (_req: Request, res: Response) => {
   const users = await User.find({});
   res.status(200).json({ success: true, data: users });
 });

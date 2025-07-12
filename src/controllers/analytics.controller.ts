@@ -61,7 +61,7 @@ export const trackShare = asyncHandler(async (req: Request, res: Response) => {
 // @desc    Get overall analytics summary
 // @route   GET /api/analytics/summary
 // @access  Admin
-export const getSummary = asyncHandler(async (req: Request, res: Response) => {
+export const getSummary = asyncHandler(async (_req: Request, res: Response) => {
   const totalPosts = await Blog.countDocuments();
 
   const analyticsSummary = await Analytics.aggregate([
@@ -86,7 +86,7 @@ export const getSummary = asyncHandler(async (req: Request, res: Response) => {
 // @desc    Get performance data for all posts
 // @route   GET /api/analytics/posts
 // @access  Admin
-export const getPostPerformance = asyncHandler(async (req: Request, res: Response) => {
+export const getPostPerformance = asyncHandler(async (_req: Request, res: Response) => {
   const postPerformance = await Analytics.aggregate([
     {
       $group: {

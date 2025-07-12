@@ -1,13 +1,9 @@
-import { Response, NextFunction } from 'express';
+import { Response, NextFunction, Request, Router } from 'express';
 import Blog from '../models/Blog.model';
 import { IAuthRequest } from '../middleware/auth.middleware';
 import { NotFoundError, ForbiddenError } from '../utils/errors';
-import { protect, authorize } from '../middleware/auth.middleware';
-import { Request } from 'express';
 import asyncHandler from '../utils/asyncHandler';
-import { validate } from '../middleware/validation.middleware';
-import { createBlogSchema, updateBlogSchema } from '../middleware/validationSchemas';
-import { Router } from 'express';
+import { createBlogSchema, updateBlogSchema } from '../validators/blog.validator';
 
 const router = Router();
 
@@ -259,7 +255,6 @@ export const searchBlogs = asyncHandler(async (req: Request, res: Response) => {
         },
       }
     : {};
-
   const blogs = await Blog.find({ ...keyword, status: 'published' });
   res.json({ blogs });
 });

@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import asyncHandler from '../utils/asyncHandler';
 import Comment from '../models/Comment.model';
 import Blog from '../models/Blog.model';
 import { AppError } from '../utils/errors';
-import { IUser } from '../models/User.model';
 import { IAuthRequest } from '../middleware/auth.middleware';
 
 // @desc    Create a new comment

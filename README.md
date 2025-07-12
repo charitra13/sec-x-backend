@@ -99,3 +99,9 @@ This project is continuously evolving. The next phase of development will focus 
 ### v1.0.2 (2024-07-13)
 
 - **Fix**: Made the `start` script more robust by chaining the `build` command. It now runs `npm run build` before `node dist/index.js` to ensure the compiled code is always present in the runtime environment on Render.
+
+### v1.1.0 (2024-07-13)
+
+- **Refactor**: Resolved multiple TypeScript and linting errors across the codebase.
+- **Fix**: Corrected a module import path in `blog.controller.ts`.
+- **Cleanup**: Removed numerous unused variables and imports from controllers and routes to improve code quality.

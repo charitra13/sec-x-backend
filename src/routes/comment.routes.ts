@@ -5,7 +5,7 @@ import {
   updateComment,
   deleteComment,
 } from '../controllers/comment.controller';
-import { protect, authorize } from '../middleware/auth.middleware';
+import { protect } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validation.middleware';
 import { createCommentSchema, updateCommentSchema } from '../validators/comment.validator';
 
