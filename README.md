@@ -1,1 +1,86 @@
 # sec-x-backend
+
+This repository contains the backend for **SecurityX**, a full-featured blog application built with a modern technology stack. It provides a robust and secure API for managing users, blog posts, comments, and more, with a focus on security and performance.
+
+## ✨ Key Features
+
+- **Authentication**: Secure user registration and login using JWT (JSON Web Tokens).
+- **Role-Based Access Control (RBAC)**: Differentiated user roles (`admin`, `reader`) to manage permissions for creating, editing, and viewing content.
+- **Complete Blog Management**: Full CRUD (Create, Read, Update, Delete) functionality for blog posts.
+- **Advanced Blog Features**:
+    - Automatic `slug` generation for SEO-friendly URLs.
+    - Calculation of estimated `readingTime`.
+    - Tracking for `views`, `likes`, and `shares`.
+    - Support for `draft` and `published` statuses.
+    - SEO metadata fields.
+- **Image Uploads**: Integrated with Cloudinary for efficient image hosting and transformations.
+- **Comment System**: Users can comment on blog posts.
+- **Input Validation**: Uses `zod` for validating all incoming request data to ensure data integrity.
+- **Security**:
+    - Password hashing with `bcryptjs`.
+    - `helmet` for protection against common web vulnerabilities.
+    - `express-rate-limit` to prevent brute-force attacks.
+- **Comprehensive API**: Well-structured and documented API endpoints for all features.
+- **Database Seeding**: Includes scripts to populate the database with initial data for testing and development.
+
+## 🛠️ Technology Stack
+
+- **Framework**: Express.js
+- **Language**: TypeScript
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JSON Web Tokens (JWT)
+- **Image Handling**: Multer and Cloudinary
+- **Validation**: Zod
+- **Security**: Helmet, Express-Rate-Limit, Bcrypt.js
+- **Other Libraries**: `cors`, `morgan`, `compression`, `slugify`
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/en/) (v16 or higher)
+- [MongoDB](https://www.mongodb.com/)
+- A [Cloudinary](https://cloudinary.com/) account for image uploads.
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/charitra13/sec-x-backend.git
+    cd sec-x-backend
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+3.  **Set up environment variables:**
+    Create a `.env` file in the root of the project by copying the example file:
+    ```bash
+    cp env.example .env
+    ```
+    Update the `.env` file with your configuration, including your MongoDB connection string and Cloudinary credentials.
+
+4.  **Run the server:**
+    ```bash
+    npm start
+    ```
+    The server will be running at `http://localhost:8080`.
+
+## ⚙️ API Endpoints
+
+The API includes endpoints for authentication, user management, blog posts, and more. For detailed information on the available endpoints, please refer to the `src/routes/` directory.
+
+- `/api/auth` - Authentication routes (login, register)
+- `/api/users` - User management
+- `/api/blogs` - Blog post operations
+- `/api/comments` - Comment management
+- `/api/health` - Health check
+
+## 📝 Next Steps
+This project is continuously evolving. The next phase of development will focus on:
+- Comment system enhancements
+- Analytics dashboard
+- Real-time notifications
+- Email integration
