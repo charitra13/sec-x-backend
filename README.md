@@ -88,6 +88,10 @@ This project is continuously evolving. The next phase of development will focus 
 
 ## 📝 Changelog
 
+### v1.0.2 (2024-07-14)
+
+- **Feat**: Updated CORS configuration to allow requests from the frontend application hosted at `https://sec-x.vercel.app`.
+
 ### v1.0.1 (2024-07-13)
 
 - **Fix**: Adjusted the `start` script in `package.json` to correct the path for the compiled entry point, resolving a deployment failure on Render. The execution environment on Render was starting from the `src` directory, and the script now accounts for this.
