@@ -32,3 +32,6 @@ coverage/
 *.swp
 *.swo
 *~
+
+# Ignore environment variables
+*.env
