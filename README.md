@@ -84,3 +84,10 @@ This project is continuously evolving. The next phase of development will focus 
 - Analytics dashboard
 - Real-time notifications
 - Email integration
+- Testing
+
+## 📝 Changelog
+
+### v1.0.1 (2024-07-13)
+
+- **Fix**: Adjusted the `start` script in `package.json` to correct the path for the compiled entry point, resolving a deployment failure on Render. The execution environment on Render was starting from the `src` directory, and the script now accounts for this.
