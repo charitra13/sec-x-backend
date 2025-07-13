@@ -3,7 +3,6 @@ import Blog from '../models/Blog.model';
 import { IAuthRequest } from '../middleware/auth.middleware';
 import { NotFoundError, ForbiddenError } from '../utils/errors';
 import asyncHandler from '../utils/asyncHandler';
-import { createBlogSchema, updateBlogSchema } from '../validators/blog.validator';
 
 const router = Router();
 

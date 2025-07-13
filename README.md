@@ -88,6 +88,12 @@ This project is continuously evolving. The next phase of development will focus 
 
 ## 📝 Changelog
 
+### v1.1.1 (2024-07-13)
+
+- **Fix**: Resolved TypeScript compilation error TS6192 that was causing Render deployment failures.
+- **Cleanup**: Removed unused validation schema imports from `blog.controller.ts` - these schemas are correctly used in the routes layer for request validation, not in controllers.
+- **Architecture**: Confirmed proper separation of concerns - validation happens at route level, business logic in controllers.
+
 ### v1.0.2 (2024-07-14)
 
 - **Feat**: Updated CORS configuration to allow requests from the frontend application hosted at `https://sec-x.vercel.app`.
