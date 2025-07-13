@@ -88,6 +88,14 @@ This project is continuously evolving. The next phase of development will focus 
 
 ## 📝 Changelog
 
+### v1.1.2 (2024-12-19)
+
+- **Fix**: Resolved Axios 400 error in comment system by adding proper validation to GET comments endpoint.
+- **Enhancement**: Added `getCommentsSchema` validation to prevent invalid blogId parameters from causing server errors.
+- **Improvement**: Enhanced error handling in `getCommentsForBlog` controller with ObjectId validation and blog existence check.
+- **Security**: Added validation middleware to all comment routes including GET and DELETE operations for consistent security.
+- **Validation**: Added `deleteCommentSchema` to ensure comment deletion requests are properly validated.
+
 ### v1.1.1 (2024-07-13)
 
 - **Fix**: Resolved TypeScript compilation error TS6192 that was causing Render deployment failures.

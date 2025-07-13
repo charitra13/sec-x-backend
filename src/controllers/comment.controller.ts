@@ -4,6 +4,7 @@ import Comment from '../models/Comment.model';
 import Blog from '../models/Blog.model';
 import { AppError } from '../utils/errors';
 import { IAuthRequest } from '../middleware/auth.middleware';
+import mongoose from 'mongoose';
 
 // @desc    Create a new comment
 // @route   POST /api/blogs/:blogId/comments
@@ -36,6 +37,17 @@ export const createComment = asyncHandler(async (req: IAuthRequest, res: Respons
 // @access  Public
 export const getCommentsForBlog = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const { blogId } = req.params;
+
+  // Validate ObjectId format (this is now handled by validation middleware, but keeping as backup)
+  if (!mongoose.Types.ObjectId.isValid(blogId)) {
+    throw new AppError('Invalid blog ID format', 400);
+  }
+
+  // Check if blog exists first
+  const blog = await Blog.findById(blogId);
+  if (!blog) {
+    throw new AppError('Blog not found', 404);
+  }
 
   const comments = await Comment.find({ blog: blogId }).populate('author', 'name avatar');
 
