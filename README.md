@@ -88,6 +88,15 @@ This project is continuously evolving. The next phase of development will focus 
 
 ## 📝 Changelog
 
+### v1.1.3 (2024-12-19)
+
+- **Fix**: Enhanced CORS configuration to resolve frontend connectivity issues.
+- **Enhancement**: Added comprehensive Access-Control-Allow-Methods including GET, POST, PUT, DELETE, PATCH, OPTIONS.
+- **Security**: Added explicit Access-Control-Allow-Headers including Authorization and Content-Type for proper auth handling.
+- **Improvement**: Added support for https://sec-x.netlify.app origin in CORS configuration.
+- **Compatibility**: Added optionsSuccessStatus: 200 for better legacy browser support.
+- **Feature**: Added exposedHeaders configuration for client-side header access.
+
 ### v1.1.2 (2024-12-19)
 
 - **Fix**: Resolved Axios 400 error in comment system by adding proper validation to GET comments endpoint.
