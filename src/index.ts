@@ -1,10 +1,14 @@
 import express, { Application, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import compression from 'compression';
+import https from 'https';
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+
 
 // Import routes
 import authRoutes from './routes/auth.routes';
@@ -12,11 +16,13 @@ import userRoutes from './routes/user.routes';
 import blogRoutes from './routes/blog.routes';
 import commentRoutes from './routes/comment.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import { corsOptions } from './config/cors.config';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
 import { NotFoundError } from './utils/errors';
 import { generalLimiter } from './middleware/rateLimiter';
+import { corsErrorHandler } from './middleware/corsError.middleware';
 
 // Load environment variables
 dotenv.config();
@@ -33,26 +39,8 @@ app.use(compression());
 app.use(generalLimiter);
 
 // CORS configuration
-app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
-    'https://sec-x.netlify.app',
-    'https://sec-x.vercel.app'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Requested-With',
-    'Accept',
-    'Origin',
-    'Cache-Control',
-    'X-File-Name'
-  ],
-  exposedHeaders: ['X-Total-Count'],
-  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
-}));
+app.use(cors(corsOptions));
+
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -84,8 +72,38 @@ app.use((_req: Request, _res: Response, next) => {
   next(new NotFoundError(`The requested URL ${_req.originalUrl} was not found on this server.`));
 });
 
+app.use(corsErrorHandler);
+
 // Global error handler
 app.use(errorHandler);
+
+
+
+// Server function
+const createServer = () => {
+  if (USE_HTTPS && process.env.NODE_ENV === 'development') {
+    const certPath = process.env.SSL_CERT_PATH || './certs/cert.pem';
+    const keyPath = process.env.SSL_KEY_PATH || './certs/key.pem';
+    
+    try {
+      const httpsOptions = {
+        cert: fs.readFileSync(path.resolve(certPath)),
+        key: fs.readFileSync(path.resolve(keyPath))
+      };
+      
+      console.log('🔐 Creating HTTPS server for development...');
+      return https.createServer(httpsOptions, app);
+    } catch (error) {
+      console.warn('⚠️  HTTPS certificates not found, falling back to HTTP');
+      console.log('💡 Run "npm run generate-certs" to create development certificates');
+      return http.createServer(app);
+    }
+  }
+  
+  return http.createServer(app);
+};
+
+
 
 // Connect to MongoDB and start the server
 const startServer = async () => {
@@ -98,9 +116,17 @@ const startServer = async () => {
     await mongoose.connect(MONGO_URI);
     console.log('✅ Successfully connected to MongoDB!');
     
-    app.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
-      console.log(`📚 API Documentation: http://localhost:${PORT}/api/health`);
+    const server = createServer();
+    const protocol = USE_HTTPS && process.env.NODE_ENV === 'development' ? 'https' : 'http';
+    
+    server.listen(PORT, () => {
+      console.log(`🚀 Server is running on ${protocol}://localhost:${PORT}`);
+      console.log(`📚 API Documentation: ${protocol}://localhost:${PORT}/api/health`);
+      
+      if (USE_HTTPS && process.env.NODE_ENV === 'development') {
+        console.log('🔐 HTTPS mode enabled for development');
+        console.log('⚠️  You may need to accept the self-signed certificate in your browser');
+      }
     });
   } catch (error) {
     console.error('❌ Failed to connect to MongoDB', error);
