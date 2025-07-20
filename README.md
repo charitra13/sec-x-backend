@@ -41,6 +41,7 @@ This repository contains the backend for **SecurityX**, a full-featured blog app
 - [Node.js](https://nodejs.org/en/) (v16 or higher)
 - [MongoDB](https://www.mongodb.com/)
 - A [Cloudinary](https://cloudinary.com/) account for image uploads.
+- [OpenSSL](https://www.openssl.org/) (for HTTPS development setup)
 
 ### Installation
 
@@ -63,6 +64,24 @@ This repository contains the backend for **SecurityX**, a full-featured blog app
     Update the `.env` file with your configuration, including your MongoDB connection string and Cloudinary credentials.
 
 4.  **Run the server:**
+
+    **HTTP Development:**
+    ```bash
+    npm run dev
+    ```
+    The server will be running at `http://localhost:8080`.
+
+    **HTTPS Development (Recommended):**
+    ```bash
+    # Generate SSL certificates for local development
+    npm run generate-certs
+    
+    # Start HTTPS development server
+    npm run dev:https
+    ```
+    The server will be running at `https://localhost:8080`.
+
+    **Production:**
     ```bash
     npm start
     ```
@@ -78,6 +97,35 @@ The API includes endpoints for authentication, user management, blog posts, and 
 - `/api/comments` - Comment management
 - `/api/health` - Health check
 
+## 🔐 HTTPS Development
+
+This project supports HTTPS development for a more production-like local environment:
+
+### SSL Certificate Generation
+```bash
+npm run generate-certs
+```
+This command generates self-signed SSL certificates for localhost development.
+
+### HTTPS Development Server
+```bash
+npm run dev:https
+```
+Starts the development server with HTTPS support using the generated certificates.
+
+### CORS Configuration
+The application includes enhanced CORS configuration that supports:
+- Dynamic origin validation
+- Development and production environments
+- Detailed CORS violation logging
+- Support for localhost HTTPS development
+
+### Available Scripts
+- `npm run dev` - HTTP development server
+- `npm run dev:https` - HTTPS development server
+- `npm run generate-certs` - Generate SSL certificates
+- `npm run setup-https` - Generate certificates and start HTTPS server
+
 ## 📝 Next Steps
 This project is continuously evolving. The next phase of development will focus on:
 - Comment system enhancements
@@ -87,6 +135,18 @@ This project is continuously evolving. The next phase of development will focus 
 - Testing
 
 ## 📝 Changelog
+
+### v1.2.0 (2024-12-19)
+
+- **Feat**: Added HTTPS development server support with self-signed certificates
+- **Feat**: Implemented enhanced CORS configuration with dynamic origin validation
+- **Feat**: Added CORS error handling middleware with detailed logging
+- **Feat**: Created generate-certs script for local SSL certificate generation
+- **Enhancement**: Added new npm scripts for HTTPS development (dev:https, generate-certs, setup-https)
+- **Enhancement**: Updated package.json with cross-env and https-localhost dependencies
+- **Refactor**: Refactored index.ts to support both HTTP and HTTPS servers
+- **Security**: Added comprehensive CORS logging and error handling
+- **Support**: Added support for localhost HTTPS development environment
 
 ### v1.1.3 (2024-12-19)
 
