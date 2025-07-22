@@ -99,6 +99,66 @@ The API includes endpoints for authentication, user management, blog posts, and 
 
 ## 🔐 HTTPS Development
 
+## 🛡️ CORS Security Implementation (Phase 3 - Production Hardening)
+
+### Overview
+This project implements enterprise-level CORS security with production hardening features:
+
+### Key Features Implemented:
+
+#### 1. **Smart Rate Limiting**
+- **OPTIONS-specific rate limiting**: 20 preflight requests per 5 minutes per IP
+- **Suspicious origin rate limiting**: 3 requests per 15 minutes for blocked origins
+- **Adaptive rate limiting**: Different limits based on request characteristics
+
+#### 2. **Origin Whitelist Management**
+- **Dynamic origin management**: Add/remove origins via API
+- **Environment-based filtering**: Separate origins for dev/staging/production
+- **Usage tracking**: Monitor origin usage patterns
+- **Admin-only access**: Secure origin management endpoints
+
+#### 3. **CORS Policy Documentation**
+- **Comprehensive documentation**: Complete CORS policy guide
+- **Schema validation**: JSON schema for CORS configuration
+- **Troubleshooting guides**: Common issues and solutions
+- **Best practices**: Security recommendations
+
+### API Endpoints Added:
+
+#### Origin Management (Admin Only)
+- `GET /api/admin/origins` - List all managed origins
+- `POST /api/admin/origins` - Add new origin
+- `PUT /api/admin/origins/:originId` - Update origin
+- `DELETE /api/admin/origins/:originId` - Remove origin
+
+#### CORS Documentation
+- `GET /api/cors/docs` - Complete CORS policy documentation
+- `GET /api/cors/schema` - CORS configuration schema
+
+#### CORS Debugging
+- `GET /api/cors-debug/status` - Check current CORS configuration
+- `GET /api/cors-debug/alerts` - View CORS violation alerts (admin)
+- `POST /api/cors-debug/test-origin` - Test origin allowance (admin)
+
+### Validation Scripts
+```bash
+# Validate CORS configuration
+npm run validate:cors
+
+# Pre-deployment validation
+npm run pre-deploy
+```
+
+### Security Features:
+- ✅ **No wildcard origins** - Only specific domains allowed
+- ✅ **HTTPS enforcement** - Production origins must use HTTPS
+- ✅ **Origin validation** - Every request validated
+- ✅ **Suspicious pattern detection** - Monitors and logs suspicious origins
+- ✅ **Rate limiting** - Prevents CORS abuse
+- ✅ **Comprehensive logging** - Detailed CORS violation tracking
+- ✅ **Admin controls** - Secure origin management
+- ✅ **Documentation** - Complete policy and troubleshooting guides
+
 This project supports HTTPS development for a more production-like local environment:
 
 ### SSL Certificate Generation

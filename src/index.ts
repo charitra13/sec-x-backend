@@ -18,12 +18,14 @@ import blogRoutes from './routes/blog.routes';
 import commentRoutes from './routes/comment.routes';
 import analyticsRoutes from './routes/analytics.routes';
 import corsDebugRoutes from './routes/corsDebug.routes';
+import originManagementRoutes from './routes/originManagement.routes';
+import corsDocumentationRoutes from './routes/corsDocumentation.routes';
 import { corsOptions } from './config/cors.config';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
 import { NotFoundError } from './utils/errors';
-import { generalLimiter } from './middleware/rateLimiter';
+import { smartCORSLimiter } from './middleware/rateLimiter';
 import { corsErrorHandler } from './middleware/corsError.middleware';
 import { validateOriginRequest, blockSuspiciousOrigins } from './middleware/originValidation.middleware';
 
@@ -40,8 +42,11 @@ const USE_HTTPS = process.env.HTTPS === 'true';
 app.use(helmet());
 app.use(compression());
 
-// Rate limiting
-app.use(generalLimiter);
+// Smart CORS rate limiting
+app.use((req, res, next) => {
+  smartCORSLimiter(req, res);
+  next();
+});
 
 // CORS configuration
 app.use(cors(corsOptions));
@@ -67,6 +72,8 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/cors-debug', corsDebugRoutes);
+app.use('/api/admin/origins', originManagementRoutes);
+app.use('/api/cors', corsDocumentationRoutes);
 
 // Health check endpoint
 app.get('/api/health', (_req: Request, res: Response) => {

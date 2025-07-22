@@ -12,6 +12,8 @@
     "start": "npm run build && node dist/index.js",
     "db:seed": "ts-node src/scripts/seed.ts",
     "db:seed:publications": "ts-node src/scripts/seedPublications.ts",
+    "validate:cors": "ts-node src/scripts/validate-cors.ts",
+    "pre-deploy": "npm run validate:cors",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts"
   },
@@ -49,6 +51,7 @@
     "eslint": "^8.54.0",
     "https-localhost": "^4.7.1",
     "prettier": "^3.1.0",
+    "ts-node-dev": "^2.0.0",
     "tsx": "^4.6.2",
     "typescript": "^5.3.2"
   }
