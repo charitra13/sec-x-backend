@@ -136,6 +136,16 @@ This project is continuously evolving. The next phase of development will focus 
 
 ## 📝 Changelog
 
+### v1.2.1 (2024-12-19)
+
+- **Feat**: Implemented comprehensive origin validation middleware with suspicious pattern detection
+- **Feat**: Added cross-referencing validation between origin and referer headers
+- **Feat**: Created blocking middleware for requests with excessive warnings
+- **Security**: Enhanced CORS security with detailed warning logging and pattern analysis
+- **Fix**: Resolved TypeScript compilation errors in CORS error handler and origin validation middleware
+- **Enhancement**: Added proper return type annotations for all middleware functions
+- **Integration**: Successfully integrated origin validation with existing CORS configuration
+
 ### v1.2.0 (2024-12-19)
 
 - **Feat**: Added HTTPS development server support with self-signed certificates

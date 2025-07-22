@@ -30,7 +30,7 @@ export class CORSViolationError extends AppError {
   }
 }
 
-export const corsErrorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+export const corsErrorHandler = (err: Error, req: Request, res: Response, next: NextFunction): void => {
   // Handle CORS-specific errors
   if (err.name === 'CORSError' || err.message.includes('CORS policy violation')) {
     const corsError = new CORSViolationError(err.message, req);
@@ -48,7 +48,7 @@ export const corsErrorHandler = (err: Error, req: Request, res: Response, next: 
       // monitoringService.logCORSViolation(corsError);
     }
 
-    return res.status(403).json({
+    res.status(403).json({
       success: false,
       error: 'CORS_VIOLATION',
       message: 'Cross-Origin Request Blocked',
@@ -59,6 +59,7 @@ export const corsErrorHandler = (err: Error, req: Request, res: Response, next: 
         }
       })
     });
+    return;
   }
 
   // Pass non-CORS errors to the next error handler

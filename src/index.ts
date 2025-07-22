@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -23,6 +24,8 @@ import { errorHandler } from './middleware/error.middleware';
 import { NotFoundError } from './utils/errors';
 import { generalLimiter } from './middleware/rateLimiter';
 import { corsErrorHandler } from './middleware/corsError.middleware';
+import { validateOriginRequest, blockSuspiciousOrigins } from './middleware/originValidation.middleware';
+
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +33,7 @@ dotenv.config();
 const app: Application = express();
 const PORT = process.env.PORT || 8080;
 const MONGO_URI = process.env.MONGODB_URI;
+const USE_HTTPS = process.env.HTTPS === 'true';
 
 // Security middleware
 app.use(helmet());
@@ -50,6 +54,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// Origin validation middleware
+app.use(validateOriginRequest);
+app.use(blockSuspiciousOrigins());
 
 // API Routes
 app.use('/api/auth', authRoutes);
