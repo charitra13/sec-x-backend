@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/errors';
+import { corsAlertSystem } from '../utils/alertSystem';
 
 interface CORSErrorDetails {
   origin: string | undefined;
@@ -35,6 +36,20 @@ export const corsErrorHandler = (err: Error, req: Request, res: Response, next: 
   if (err.name === 'CORSError' || err.message.includes('CORS policy violation')) {
     const corsError = new CORSViolationError(err.message, req);
     
+    // Generate CORS violation alert
+    corsAlertSystem.generateAlert(
+      'VIOLATION',
+      corsError.details.origin || 'unknown',
+      corsError.details.ip,
+      corsError.details.userAgent || 'unknown',
+      {
+        method: corsError.details.method,
+        path: corsError.details.path,
+        referer: corsError.details.referer,
+        errorMessage: err.message
+      }
+    );
+
     // Log detailed CORS violation information
     console.error('🚨 CORS VIOLATION DETECTED:', {
       error: corsError.message,

@@ -17,6 +17,7 @@ import userRoutes from './routes/user.routes';
 import blogRoutes from './routes/blog.routes';
 import commentRoutes from './routes/comment.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import corsDebugRoutes from './routes/corsDebug.routes';
 import { corsOptions } from './config/cors.config';
 
 // Import middleware
@@ -65,6 +66,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/cors-debug', corsDebugRoutes);
 
 // Health check endpoint
 app.get('/api/health', (_req: Request, res: Response) => {

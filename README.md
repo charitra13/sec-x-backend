@@ -136,6 +136,17 @@ This project is continuously evolving. The next phase of development will focus 
 
 ## 📝 Changelog
 
+### v1.2.2 (2024-12-19)
+
+- **Feat**: Implemented comprehensive CORS alert system with severity-based monitoring
+- **Feat**: Added CORS debugging endpoints for status checking and alert management
+- **Feat**: Created alert system with violation counting and threshold-based severity
+- **Feat**: Integrated alert system with CORS error handler and origin validation middleware
+- **Security**: Enhanced monitoring with detailed alert logging and external monitoring support
+- **API**: Added new CORS debug endpoints (/api/cors-debug/status, /api/cors-debug/alerts, /api/cors-debug/test-origin)
+- **Monitoring**: Implemented alert statistics and top violating origins tracking
+- **Fix**: Resolved TypeScript compilation errors in alert system and debug controller
+
 ### v1.2.1 (2024-12-19)
 
 - **Feat**: Implemented comprehensive origin validation middleware with suspicious pattern detection

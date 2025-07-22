@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { corsAlertSystem } from '../utils/alertSystem';
 
 interface OriginValidationResult {
   isValid: boolean;
@@ -79,6 +80,21 @@ export const validateOriginRequest = (req: Request, _res: Response, next: NextFu
         ip: req.ip,
         timestamp: new Date().toISOString()
       });
+
+      // Generate alert for suspicious origin patterns
+      corsAlertSystem.generateAlert(
+        'SUSPICIOUS',
+        origin || 'unknown',
+        req.ip || 'unknown',
+        userAgent || 'unknown',
+        {
+          warnings: result.warnings,
+          suspiciousPatterns: result.details.suspiciousPatterns,
+          referer,
+          path: req.path,
+          method: req.method
+        }
+      );
     }
 
     // Add validation result to request for potential use in other middleware
@@ -110,6 +126,21 @@ export const blockSuspiciousOrigins = (maxWarnings: number = 3) => {
         ip: req.ip,
         timestamp: new Date().toISOString()
       });
+
+      // Generate alert for blocked request
+      corsAlertSystem.generateAlert(
+        'BLOCKED',
+        req.headers.origin || 'unknown',
+        req.ip || 'unknown',
+        req.headers['user-agent'] || 'unknown',
+        {
+          warnings: validation.warnings,
+          warningCount: validation.warnings.length,
+          maxWarnings,
+          path: req.path,
+          method: req.method
+        }
+      );
       
       res.status(403).json({
         success: false,
