@@ -48,7 +48,6 @@ export const suspiciousOriginLimiter = createRateLimit(
 
 // Create a smart rate limiter that adapts based on request type
 export const smartCORSLimiter = (req: any, res: any) => {
-  const origin = req.headers.origin;
   const isOptionsRequest = req.method === 'OPTIONS';
   const hasOriginWarnings = req.originValidation?.warnings?.length > 0;
   

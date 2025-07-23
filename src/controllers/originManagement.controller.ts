@@ -2,12 +2,12 @@ import { Request, Response } from 'express';
 import { originManagementService } from '../services/originManagement.service';
 import { IAuthRequest } from '../middleware/auth.middleware';
 
-export const getAllOrigins = async (req: Request, res: Response) => {
+export const getAllOrigins = async (_req: Request, res: Response) => {
   try {
     const origins = originManagementService.getAllOrigins();
     const stats = originManagementService.getOriginStats();
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         origins,
@@ -15,7 +15,7 @@ export const getAllOrigins = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to fetch origins',
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -53,13 +53,13 @@ export const addOrigin = async (req: IAuthRequest, res: Response) => {
       tags
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Origin added successfully',
       data: newOrigin
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to add origin',
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -81,13 +81,13 @@ export const updateOrigin = async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Origin updated successfully',
       data: updatedOrigin
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to update origin',
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -108,12 +108,12 @@ export const removeOrigin = async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Origin removed successfully'
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to remove origin',
       error: error instanceof Error ? error.message : 'Unknown error'

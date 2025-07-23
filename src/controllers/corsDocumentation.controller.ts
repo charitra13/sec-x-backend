@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { allowedOrigins } from '../config/cors.config';
 
-export const getCORSDocumentation = (req: Request, res: Response) => {
+export const getCORSDocumentation = (_req: Request, res: Response) => {
   const documentation = {
     title: 'CORS Policy Documentation',
     version: '1.0.0',
@@ -133,7 +133,7 @@ export const getCORSDocumentation = (req: Request, res: Response) => {
   });
 };
 
-export const getCORSSchema = (req: Request, res: Response) => {
+export const getCORSSchema = (_req: Request, res: Response) => {
   const schema = {
     type: 'object',
     properties: {
