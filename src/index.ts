@@ -28,6 +28,7 @@ import { NotFoundError } from './utils/errors';
 import { smartCORSLimiter } from './middleware/rateLimiter';
 import { corsErrorHandler } from './middleware/corsError.middleware';
 import { validateOriginRequest, blockSuspiciousOrigins } from './middleware/originValidation.middleware';
+import { securityHeaders } from './middleware/security.middleware';
 
 
 // Load environment variables
@@ -41,6 +42,9 @@ const USE_HTTPS = process.env.HTTPS === 'true';
 // Security middleware
 app.use(helmet());
 app.use(compression());
+
+// Apply security headers before CORS
+app.use(securityHeaders);
 
 // Smart CORS rate limiting
 app.use((req, res, next) => {

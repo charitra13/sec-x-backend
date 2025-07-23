@@ -186,6 +186,72 @@ The application includes enhanced CORS configuration that supports:
 - `npm run generate-certs` - Generate SSL certificates
 - `npm run setup-https` - Generate certificates and start HTTPS server
 
+## 🔧 Debugging Deployment Issues
+
+If you're experiencing issues with the deployed API on Render, follow these debugging steps:
+
+### 1. **Test Local Development**
+```bash
+# Start local development server
+npm run dev
+
+# Test endpoints locally
+node test-api.js
+```
+
+### 2. **Test Deployment**
+```bash
+# Test the deployed API
+node debug-deployment.js
+```
+
+### 3. **Common Issues and Solutions**
+
+#### Issue: "No URL exists" error
+- **Cause**: Server might not be running or build failed
+- **Solution**: Check Render logs for build errors
+
+#### Issue: CORS errors
+- **Cause**: Origin not in allowed list
+- **Solution**: Add your frontend URL to `src/config/cors.config.ts`
+
+#### Issue: 404 errors
+- **Cause**: Routes not properly deployed
+- **Solution**: Ensure TypeScript compilation succeeds
+
+### 4. **API Endpoints Reference**
+
+**Authentication:**
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
+
+**Health Check:**
+- `GET /api/health` - Server status
+
+**Required Headers:**
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+**Login Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Register Request Body:**
+```json
+{
+  "name": "User Name",
+  "email": "user@example.com", 
+  "password": "password123"
+}
+```
+
 ## 📝 Next Steps
 This project is continuously evolving. The next phase of development will focus on:
 - Comment system enhancements
@@ -195,6 +261,16 @@ This project is continuously evolving. The next phase of development will focus 
 - Testing
 
 ## 📝 Changelog
+
+### v1.2.4 (2024-12-19)
+
+- **Feat**: Implemented comprehensive security headers middleware with production-ready security features
+- **Security**: Added X-Content-Type-Options, X-Frame-Options, X-XSS-Protection headers
+- **Security**: Implemented Referrer-Policy and HSTS headers for enhanced security
+- **Security**: Added Content Security Policy (CSP) for production environments
+- **Security**: Removed X-Powered-By header to prevent information disclosure
+- **Integration**: Successfully integrated security headers middleware into main application flow
+- **Architecture**: Applied security headers before CORS configuration for optimal security posture
 
 ### v1.2.3 (2024-12-19)
 
