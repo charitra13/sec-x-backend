@@ -269,6 +269,9 @@ This project is continuously evolving. The next phase of development will focus 
 - Feat: Enabled custom headers `X-Warming-Request` and `X-Warming-Source` in CORS config
 - Feat: Blogs endpoint supports `sort=popular` alias (maps to `-views -likes -createdAt`)
 - Security: Bypass origin validation for explicit warming pings to prevent false blocks
+- Feat: Implemented self-warming service (interval pings, retry, stats)
+- Feat: Added warming middleware and enhanced health routes with warming metadata and stats
+- Feat: Database warming utilities to keep connections and common queries warm
 
 ### v1.2.4 (2024-12-19)
 
