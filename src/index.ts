@@ -21,6 +21,9 @@ import corsDebugRoutes from './routes/corsDebug.routes';
 import originManagementRoutes from './routes/originManagement.routes';
 import corsDocumentationRoutes from './routes/corsDocumentation.routes';
 import { corsOptions } from './config/cors.config';
+import { selfWarmingService } from './services/warmingService';
+import { warmingMiddleware } from './middleware/warmingMiddleware';
+import healthRoutes from './routes/health';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware';
@@ -69,6 +72,9 @@ if (process.env.NODE_ENV === 'development') {
 app.use(validateOriginRequest);
 app.use(blockSuspiciousOrigins());
 
+// Warming request tracking
+app.use(warmingMiddleware.trackWarmingRequest);
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -79,14 +85,8 @@ app.use('/api/cors-debug', corsDebugRoutes);
 app.use('/api/admin/origins', originManagementRoutes);
 app.use('/api/cors', corsDocumentationRoutes);
 
-// Health check endpoint
-app.get('/api/health', (_req: Request, res: Response) => {
-  res.status(200).json({ 
-    message: 'SecurityX Backend API is running!',
-    timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV
-  });
-});
+// Health routes (enhanced)
+app.use('/api', healthRoutes);
 
 // Handle 404 Not Found errors
 app.use((_req: Request, _res: Response, next) => {
@@ -148,6 +148,11 @@ const startServer = async () => {
         console.log('🔐 HTTPS mode enabled for development');
         console.log('⚠️  You may need to accept the self-signed certificate in your browser');
       }
+
+      // Start self-warming service shortly after server is ready
+      setTimeout(() => {
+        selfWarmingService.start();
+      }, 5000);
     });
   } catch (error) {
     console.error('❌ Failed to connect to MongoDB', error);
@@ -158,3 +163,17 @@ const startServer = async () => {
 startServer();
 
 export default app;
+
+// Graceful shutdown handling
+const gracefulShutdown = (signal: string) => {
+  console.log(`${signal} received, shutting down gracefully...`);
+  selfWarmingService.stop();
+  mongoose.connection
+    .close()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(0));
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('unhandledRejection', () => gracefulShutdown('Unhandled Rejection'));
