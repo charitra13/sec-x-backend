@@ -65,7 +65,10 @@ export const corsOptions: CorsOptions = {
     'Accept',
     'Origin',
     'Cache-Control',
-    'X-File-Name'
+    'X-File-Name',
+    // Custom headers used by frontend warming services
+    'X-Warming-Request',
+    'X-Warming-Source'
   ],
   exposedHeaders: ['X-Total-Count', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'],
   optionsSuccessStatus: 200, // Legacy browser support
