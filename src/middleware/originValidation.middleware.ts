@@ -16,6 +16,8 @@ export const validateOriginRequest = (req: Request, _res: Response, next: NextFu
   const origin = req.headers.origin;
   const referer = req.headers.referer;
   const userAgent = req.headers['user-agent'];
+  const isWarming = req.headers['x-warming-request'] === 'true';
+  const isHealthCheck = req.path === '/api/health';
   
   const result: OriginValidationResult = {
     isValid: true,
@@ -29,7 +31,8 @@ export const validateOriginRequest = (req: Request, _res: Response, next: NextFu
   };
 
   // Skip validation for requests without origin (API calls, mobile apps)
-  if (!origin) {
+  // Also skip for explicit warming pings and health checks
+  if (!origin || isWarming || isHealthCheck) {
     return next();
   }
 

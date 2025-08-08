@@ -262,6 +262,14 @@ This project is continuously evolving. The next phase of development will focus 
 
 ## 📝 Changelog
 
+### v1.2.5 (2025-08-08)
+
+- Feat: Added backend support for frontend cold-start warming services
+- Feat: Health endpoint confirmed and exempted from origin validation for reliability
+- Feat: Enabled custom headers `X-Warming-Request` and `X-Warming-Source` in CORS config
+- Feat: Blogs endpoint supports `sort=popular` alias (maps to `-views -likes -createdAt`)
+- Security: Bypass origin validation for explicit warming pings to prevent false blocks
+
 ### v1.2.4 (2024-12-19)
 
 - **Feat**: Implemented comprehensive security headers middleware with production-ready security features

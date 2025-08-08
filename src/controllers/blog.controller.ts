@@ -60,10 +60,16 @@ export const getAllBlogs = async (req: IAuthRequest, res: Response, next: NextFu
       query.$text = { $search: req.query.search };
     }
 
-    // Sort options
+    // Sort options with support for "popular" alias
     let sortBy = '-createdAt';
     if (req.query.sort) {
-      sortBy = req.query.sort as string;
+      const sortParam = (req.query.sort as string).toString();
+      if (sortParam === 'popular') {
+        // Popularity heuristic: views desc, likes count desc, createdAt desc
+        sortBy = '-views -likes -createdAt';
+      } else {
+        sortBy = sortParam;
+      }
     }
 
     const blogs = await Blog.find(query)
