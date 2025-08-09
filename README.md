@@ -262,6 +262,14 @@ This project is continuously evolving. The next phase of development will focus 
 
 ## 📝 Changelog
 
+### v1.2.6 (2025-08-09)
+
+- **Feat**: Include user role (and email) in JWT payload to enable frontend middleware (Next.js) authorization and admin routing in production
+- **Update**: `src/utils/jwt.utils.ts` now signs `{ id, role, email? }` and verification returns a typed payload
+- **Update**: `src/controllers/auth.controller.ts` now passes `role` and `email` when generating tokens in both register and login handlers
+- **Ops**: Ensure `JWT_SECRET` is identical across backend and Vercel frontend middleware environments so tokens can be decoded consistently
+- **Note**: Optional hardening — consider removing the default JWT secret fallback and require `JWT_SECRET` in all environments
+
 ### v1.2.5 (2025-08-08)
 
 - Feat: Added backend support for frontend cold-start warming services

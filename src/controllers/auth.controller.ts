@@ -22,7 +22,11 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     await user.save();
 
     // Generate a token
-    const token = generateToken(user._id.toString());
+    const token = generateToken({
+      id: user._id.toString(),
+      role: user.role,
+      email: user.email
+    });
 
     // Send response
     res.status(201).json({
@@ -62,7 +66,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     // Generate a token
-    const token = generateToken(user._id.toString());
+    const token = generateToken({
+      id: user._id.toString(),
+      role: user.role,
+      email: user.email
+    });
 
     // Send response
     res.status(200).json({
