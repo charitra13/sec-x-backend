@@ -1,7 +1,16 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET: string = process.env.JWT_SECRET || 'your_default_secret';
-const JWT_EXPIRES_IN: string = process.env.JWT_EXPIRES_IN || '1d';
+const secretFromEnv = process.env.JWT_SECRET;
+if (!secretFromEnv) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+const JWT_SECRET: string = secretFromEnv;
+
+const expiresInFromEnv = process.env.JWT_EXPIRES_IN;
+if (!expiresInFromEnv) {
+  throw new Error('JWT_EXPIRES_IN environment variable is required');
+}
+const JWT_EXPIRES_IN: string = expiresInFromEnv;
 
 export type JwtRole = 'admin' | 'reader';
 
