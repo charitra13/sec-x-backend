@@ -104,3 +104,17 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     next(error);
   }
 };
+
+/**
+ * Checks if a username is available.
+ * @route GET /api/auth/check-username/:username
+ */
+export const checkUsernameAvailability = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { username } = req.params as { username: string };
+    const existingUser = await User.findOne({ username: username.toLowerCase() });
+    res.status(200).json({ available: !existingUser });
+  } catch (error) {
+    next(error);
+  }
+};

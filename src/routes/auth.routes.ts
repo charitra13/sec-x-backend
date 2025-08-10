@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login } from '../controllers/auth.controller';
+import { register, login, checkUsernameAvailability } from '../controllers/auth.controller';
 import { validate } from '../middleware/validation.middleware';
 import { registerSchema, loginSchema } from '../validators/auth.validator';
 
@@ -18,5 +18,12 @@ router.post('/register', validate(registerSchema), register);
  * @access  Public
  */
 router.post('/login', validate(loginSchema), login);
+
+/**
+ * @route   GET /api/auth/check-username/:username
+ * @desc    Check if a username is available
+ * @access  Public
+ */
+router.get('/check-username/:username', checkUsernameAvailability);
 
 export default router;
