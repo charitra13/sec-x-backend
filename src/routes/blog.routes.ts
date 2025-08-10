@@ -7,7 +7,8 @@ import {
   deleteBlog,
   likeBlog,
   getMyBlogs,
-  searchBlogs
+  searchBlogs,
+  validateAndFixBlogs
 } from '../controllers/blog.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validation.middleware';
@@ -31,5 +32,6 @@ router.post('/:id/like', protect, likeBlog);
 router.post('/', protect, authorize('admin'), validate(createBlogSchema), createBlog);
 router.put('/:id', protect, authorize('admin'), validate(updateBlogSchema), updateBlog);
 router.delete('/:id', protect, authorize('admin'), deleteBlog);
+router.post('/validate-and-fix', protect, authorize('admin'), validateAndFixBlogs);
 
 export default router; 

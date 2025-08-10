@@ -1,5 +1,6 @@
 import { Response, NextFunction, Request, Router } from 'express';
 import Blog from '../models/Blog.model';
+import slugify from 'slugify';
 import { IAuthRequest } from '../middleware/auth.middleware';
 import { NotFoundError, ForbiddenError } from '../utils/errors';
 import asyncHandler from '../utils/asyncHandler';
@@ -34,9 +35,18 @@ export const getAllBlogs = async (req: IAuthRequest, res: Response, next: NextFu
 
     // Build query filters
     const query: any = {};
-    
+
     if (req.query.status) {
-      query.status = req.query.status;
+      // Handle special 'all' status for admins
+      if (req.query.status === 'all' && req.user?.role === 'admin') {
+        // Don't add status filter - show all blogs regardless of status
+      } else if (req.query.status === 'all') {
+        // Non-admin users requesting 'all' should only see published
+        query.status = 'published';
+      } else {
+        // Specific status requested
+        query.status = req.query.status;
+      }
     } else {
       // Non-admin users can only see published blogs
       if (req.user?.role !== 'admin') {
@@ -73,17 +83,29 @@ export const getAllBlogs = async (req: IAuthRequest, res: Response, next: NextFu
     }
 
     const blogs = await Blog.find(query)
-      .populate('author', 'name email avatar')
+      .populate({
+        path: 'author',
+        select: 'name email avatar',
+        // Handle missing authors gracefully
+        options: {
+          lean: true,
+          // If author doesn't exist, don't include the blog or set default
+          strictPopulate: false
+        } as any
+      })
       .sort(sortBy)
       .skip(skip)
       .limit(limit);
+
+    // Filter out blogs with invalid author references
+    const validBlogs = blogs.filter((blog: any) => blog.author && (blog.author as any)._id);
 
     const total = await Blog.countDocuments(query);
 
     res.json({
       success: true,
       data: {
-        blogs,
+        blogs: validBlogs,
         pagination: {
           page,
           limit,
@@ -265,3 +287,92 @@ export const searchBlogs = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export default router; 
+
+export const validateAndFixBlogs = async (req: IAuthRequest, res: Response, next: NextFunction) => {
+  try {
+    // Only admins can run this operation
+    if (req.user?.role !== 'admin') {
+      throw new ForbiddenError('Only admins can run blog validation');
+    }
+
+    const blogs = await Blog.find({});
+    const fixedBlogs: Array<{ id: any; title: string; fixes: string[] }> = [];
+
+    for (const blog of blogs) {
+      let needsSave = false;
+      const updates: any = {};
+
+      // Fix missing slug
+      if (!blog.slug && blog.title) {
+        updates.slug = slugify(blog.title, { lower: true, strict: true });
+        needsSave = true;
+      }
+
+      // Fix missing readingTime
+      if ((!blog.readingTime || blog.readingTime === 0) && blog.content) {
+        const wordsPerMinute = 200;
+        const wordCount = blog.content.split(' ').length;
+        updates.readingTime = Math.ceil(wordCount / wordsPerMinute);
+        needsSave = true;
+      }
+
+      // Fix missing publishedAt for published blogs
+      if (blog.status === 'published' && !blog.publishedAt) {
+        updates.publishedAt = (blog as any).createdAt || new Date();
+        needsSave = true;
+      }
+
+      // Fix missing shares object
+      if (!blog.shares || typeof blog.shares !== 'object') {
+        updates.shares = {
+          total: 0,
+          twitter: 0,
+          facebook: 0,
+          linkedin: 0,
+          whatsapp: 0
+        };
+        needsSave = true;
+      }
+
+      // Fix missing default values
+      if ((blog as any).views === undefined) {
+        updates.views = 0;
+        needsSave = true;
+      }
+
+      if ((blog as any).isFeature === undefined) {
+        updates.isFeature = false;
+        needsSave = true;
+      }
+
+      if (!blog.likes) {
+        updates.likes = [];
+        needsSave = true;
+      }
+
+      if (needsSave) {
+        await Blog.findByIdAndUpdate(blog._id, updates, {
+          new: true,
+          runValidators: true
+        });
+        fixedBlogs.push({
+          id: blog._id,
+          title: blog.title,
+          fixes: Object.keys(updates)
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Validated ${blogs.length} blogs, fixed ${fixedBlogs.length} blogs`,
+      data: {
+        totalBlogs: blogs.length,
+        fixedBlogs: fixedBlogs.length,
+        fixes: fixedBlogs
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
