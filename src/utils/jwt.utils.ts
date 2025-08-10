@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { SessionService } from '../services/sessionService';
 
 const secretFromEnv = process.env.JWT_SECRET;
 if (!secretFromEnv) {
@@ -27,5 +28,17 @@ export const generateToken = (payload: JwtPayload): string => {
 
 export const verifyToken = (token: string): JwtPayload & { iat: number; exp: number } => {
   const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload & { iat: number; exp: number };
+  return decoded;
+};
+
+// Enhanced verification with blacklist check
+export const verifyTokenWithBlacklist = async (
+  token: string
+): Promise<JwtPayload & { iat: number; exp: number }> => {
+  const decoded = verifyToken(token);
+  const isBlacklisted = await SessionService.isTokenBlacklisted(token);
+  if (isBlacklisted) {
+    throw new Error('Token has been invalidated');
+  }
   return decoded;
 };

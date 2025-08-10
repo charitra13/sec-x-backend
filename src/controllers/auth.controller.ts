@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import User from '../models/User.model';
 import { generateToken } from '../utils/jwt.utils';
 import { ConflictError, UnauthorizedError, NotFoundError } from '../utils/errors';
+import { SessionService } from '../services/sessionService';
+import { IAuthRequest } from '../middleware/auth.middleware';
 
 /**
  * Registers a new user.
@@ -36,7 +38,20 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       username: user.username
     });
 
-    // Send response
+    // Set httpOnly cookie for enhanced security
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/'
+    });
+
+    // Update lastLogin
+    user.lastLogin = new Date();
+    await user.save();
+
+    // Send response (still include token for backward compatibility)
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
@@ -87,6 +102,19 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       username: user.username
     });
 
+    // Set httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/'
+    });
+
+    // Update lastLogin
+    user.lastLogin = new Date();
+    await user.save();
+
     // Send response
     res.status(200).json({
       success: true,
@@ -100,6 +128,57 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         role: user.role,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Logout current session
+ * @route POST /api/auth/logout
+ */
+export const logout = async (req: IAuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const token = req.token;
+    const userId = req.user?.id;
+
+    if (token && userId) {
+      await SessionService.blacklistToken(token, userId);
+    }
+
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/'
+    });
+
+    res.status(200).json({ success: true, message: 'Logged out successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Logout from all devices
+ * @route POST /api/auth/logout-all
+ */
+export const logoutAll = async (req: IAuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id;
+
+    if (userId) {
+      await SessionService.invalidateUserSessions(userId);
+    }
+
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/'
+    });
+
+    res.status(200).json({ success: true, message: 'Logged out from all devices successfully' });
   } catch (error) {
     next(error);
   }

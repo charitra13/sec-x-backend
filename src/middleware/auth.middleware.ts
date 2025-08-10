@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../utils/jwt.utils';
+import { verifyTokenWithBlacklist } from '../utils/jwt.utils';
 import { UnauthorizedError, ForbiddenError } from '../utils/errors';
 import User from '../models/User.model';
 
@@ -10,6 +10,7 @@ export interface IAuthRequest extends Request {
     role: string;
     email: string;
   };
+  token?: string;
 }
 
 /**
@@ -29,8 +30,8 @@ export const protect = async (req: IAuthRequest, _res: Response, next: NextFunct
   }
 
   try {
-    // Verify the token
-    const decoded = verifyToken(token);
+    // Verify the token with blacklist check
+    const decoded = await verifyTokenWithBlacklist(token);
     const user = await User.findById(decoded.id);
 
     if (!user) {
@@ -41,16 +42,20 @@ export const protect = async (req: IAuthRequest, _res: Response, next: NextFunct
       return next(new UnauthorizedError('User account is deactivated'));
     }
 
-    // Attach user to the request object
+    // Attach user and token to the request object
     req.user = {
       id: user._id.toString(),
       role: user.role,
       email: user.email
     };
+    req.token = token;
 
     next();
   } catch (error) {
-    return next(new UnauthorizedError('Not authorized, token failed'));
+    const message = (error as Error).message === 'Token has been invalidated'
+      ? 'Session has been terminated'
+      : 'Not authorized, token failed';
+    return next(new UnauthorizedError(message));
   }
 };
 

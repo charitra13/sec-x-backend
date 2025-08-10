@@ -1,7 +1,14 @@
 import { Router } from 'express';
-import { register, login, checkUsernameAvailability } from '../controllers/auth.controller';
+import { 
+  register, 
+  login, 
+  logout, 
+  logoutAll, 
+  checkUsernameAvailability 
+} from '../controllers/auth.controller';
 import { validate } from '../middleware/validation.middleware';
 import { registerSchema, loginSchema } from '../validators/auth.validator';
+import { protect } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -18,6 +25,20 @@ router.post('/register', validate(registerSchema), register);
  * @access  Public
  */
 router.post('/login', validate(loginSchema), login);
+
+/**
+ * @route   POST /api/auth/logout
+ * @desc    Logout current session
+ * @access  Private
+ */
+router.post('/logout', protect, logout);
+
+/**
+ * @route   POST /api/auth/logout-all
+ * @desc    Logout from all devices
+ * @access  Private
+ */
+router.post('/logout-all', protect, logoutAll);
 
 /**
  * @route   GET /api/auth/check-username/:username
