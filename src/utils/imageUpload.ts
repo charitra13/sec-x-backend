@@ -10,11 +10,17 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Require explicit Cloudinary folder from environment
+const cloudinaryFolder = process.env.CLOUDINARY_FOLDER;
+if (!cloudinaryFolder) {
+  throw new Error('CLOUDINARY_FOLDER environment variable is required');
+}
+
 // Configure Cloudinary storage
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'securityx-blog',
+    folder: cloudinaryFolder,
     allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     transformation: [
       { width: 1200, height: 630, crop: 'fill' },
