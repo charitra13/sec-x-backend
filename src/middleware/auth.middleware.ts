@@ -72,3 +72,64 @@ export const authorize = (...roles: string[]) => {
     next();
   };
 };
+
+/**
+ * Optional authentication middleware - doesn't fail if no token provided
+ * Attaches user info to request if valid token is present
+ * Useful for endpoints that should work for both public and authenticated users
+ */
+export const optionalAuth = async (req: IAuthRequest, _res: Response, next: NextFunction) => {
+  let token: string | undefined;
+
+  // Check for token in Authorization header (Bearer token)
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  } else {
+    // Fallback: Check for token in cookies (for browser-based requests)
+    const cookies = (req as any).cookies;
+    if (cookies && cookies.token) {
+      token = cookies.token as string;
+    }
+  }
+
+  // If token exists, try to verify it
+  if (token) {
+    try {
+      // Verify token with existing blacklist check
+      const decoded = await verifyTokenWithBlacklist(token);
+      const user = await User.findById(decoded.id);
+
+      // Only attach user if valid and active
+      if (user && user.isActive) {
+        req.user = {
+          id: user._id.toString(),
+          role: user.role,
+          email: user.email
+        };
+        req.token = token;
+      }
+    } catch (error) {
+      // Log invalid token attempts for security monitoring; do not block request
+      // eslint-disable-next-line no-console
+      console.log('Invalid token in optional auth:', (error as Error).message);
+    }
+  }
+
+  // Always continue to next middleware/controller (this is key!)
+  next();
+};
+
+/**
+ * Conditional auth middleware - dynamically requires auth based on request conditions
+ * Useful for endpoints that need auth only in certain scenarios
+ */
+export const conditionalAuth = (condition: (req: IAuthRequest) => boolean) => {
+  return async (req: IAuthRequest, res: Response, next: NextFunction) => {
+    if (condition(req)) {
+      // Use strict protect middleware if condition is met
+      return protect(req, res, next);
+    }
+    // Use optional auth if condition is not met
+    return optionalAuth(req, res, next);
+  };
+};

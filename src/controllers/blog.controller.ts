@@ -1,4 +1,4 @@
-import { Response, NextFunction, Request, Router } from 'express';
+import { Response, NextFunction, Router } from 'express';
 import Blog from '../models/Blog.model';
 import slugify from 'slugify';
 import { IAuthRequest } from '../middleware/auth.middleware';
@@ -273,7 +273,7 @@ export const getMyBlogs = async (req: IAuthRequest, res: Response, next: NextFun
 // @desc    Search blogs by keyword
 // @route   GET /api/blogs/search
 // @access  Public
-export const searchBlogs = asyncHandler(async (req: Request, res: Response) => {
+export const searchBlogs = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const keyword = req.query.keyword
     ? {
         title: {
@@ -282,8 +282,31 @@ export const searchBlogs = asyncHandler(async (req: Request, res: Response) => {
         },
       }
     : {};
-  const blogs = await Blog.find({ ...keyword, status: 'published' });
-  res.json({ blogs });
+
+  // Build query based on user context
+  const query: any = { ...keyword };
+
+  // Apply status filter based on user role
+  if (req.user?.role === 'admin') {
+    // Admins can search all blogs including drafts
+    if (req.query.status && req.query.status !== 'all') {
+      query.status = req.query.status;
+    }
+    // If no status specified or status=all, don't add status filter (search all)
+  } else {
+    // Non-admin users can only search published blogs
+    query.status = 'published';
+  }
+
+  const blogs = await Blog.find(query)
+    .populate('author', 'name email avatar')
+    .sort('-createdAt');
+
+  res.json({
+    success: true,
+    blogs: blogs,
+    totalResults: blogs.length
+  });
 });
 
 export default router; 

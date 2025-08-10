@@ -10,7 +10,7 @@ import {
   searchBlogs,
   validateAndFixBlogs
 } from '../controllers/blog.controller';
-import { protect, authorize } from '../middleware/auth.middleware';
+import { protect, authorize, optionalAuth } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validation.middleware';
 import { createBlogSchema, updateBlogSchema } from '../validators/blog.validator';
 import commentRouter from './comment.routes';
@@ -19,10 +19,11 @@ const router = Router();
 
 router.use('/:blogId/comments', commentRouter);
 
-// Public routes
-router.get('/', getAllBlogs);
-router.get('/search', searchBlogs);
-router.get('/slug/:slug', getBlogBySlug);
+// Public routes with optional authentication
+// This allows both public access AND admin context when authenticated
+router.get('/', optionalAuth, getAllBlogs);
+router.get('/search', optionalAuth, searchBlogs);
+router.get('/slug/:slug', optionalAuth, getBlogBySlug);
 
 // Protected routes – user must be authenticated
 router.get('/my-blogs', protect, getMyBlogs);
