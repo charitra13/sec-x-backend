@@ -20,12 +20,32 @@ export interface IAuthRequest extends Request {
 export const protect = async (req: IAuthRequest, _res: Response, next: NextFunction) => {
   let token;
 
-  // Check for token in the Authorization header
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+  // PRIORITY 1: Check for httpOnly cookie (Primary auth method)
+  if (req.cookies && (req.cookies as any).token) {
+    token = (req.cookies as any).token;
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('🍪 Using token from httpOnly cookie');
+    }
+  }
+  // PRIORITY 2: Check Authorization header (Fallback for API clients)
+  else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('📋 Using token from Authorization header');
+    }
   }
 
   if (!token) {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('❌ No token found in cookies or headers');
+      // eslint-disable-next-line no-console
+      console.log('Cookies:', (req as any).cookies);
+      // eslint-disable-next-line no-console
+      console.log('Auth Header:', req.headers.authorization);
+    }
     return next(new UnauthorizedError('Not authorized to access this route'));
   }
 
