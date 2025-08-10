@@ -9,23 +9,31 @@ import { ConflictError, UnauthorizedError, NotFoundError } from '../utils/errors
  */
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, username, email, password } = req.body;
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    // Check if user already exists by email OR username
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
     if (existingUser) {
-      throw new ConflictError('User with this email already exists');
+      if (existingUser.email === email) {
+        throw new ConflictError('User with this email already exists');
+      }
+      if (existingUser.username === username) {
+        throw new ConflictError('Username is already taken');
+      }
     }
 
     // Create and save the new user
-    const user = new User({ name, email, password });
+    const user = new User({ name, username, email, password });
     await user.save();
 
     // Generate a token
     const token = generateToken({
       id: user._id.toString(),
       role: user.role,
-      email: user.email
+      email: user.email,
+      username: user.username
     });
 
     // Send response
@@ -36,6 +44,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       user: {
         id: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role,
       },
@@ -51,10 +60,15 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
  */
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password } = req.body;
+    const { emailOrUsername, password } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ email }).select('+password');
+    // Find user by email OR username
+    const user = await User.findOne({
+      $or: [
+        { email: emailOrUsername.toLowerCase() },
+        { username: emailOrUsername.toLowerCase() }
+      ]
+    }).select('+password');
     if (!user) {
       throw new NotFoundError('User not found');
     }
@@ -69,7 +83,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const token = generateToken({
       id: user._id.toString(),
       role: user.role,
-      email: user.email
+      email: user.email,
+      username: user.username
     });
 
     // Send response
@@ -80,6 +95,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       user: {
         id: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role,
       },

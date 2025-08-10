@@ -3,6 +3,7 @@ import { Request } from 'express';
 export interface IUser {
   _id: string;
   name: string;
+  username: string;
   email: string;
   password: string;
   createdAt: Date;
@@ -13,6 +14,7 @@ export interface IUser {
 export interface IUserPayload {
   userId: string;
   email: string;
+  username: string;
 }
 
 export interface IAuthRequest extends Request {
@@ -22,15 +24,17 @@ export interface IAuthRequest extends Request {
 export interface ITokenPayload {
   userId: string;
   email: string;
+  username: string;
 }
 
 export interface ILoginInput {
-  email: string;
+  emailOrUsername: string;
   password: string;
 }
 
 export interface ISignupInput {
   name: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -41,7 +45,9 @@ export interface IAuthResponse {
   user: {
     id: string;
     name: string;
+    username: string;
     email: string;
+    role: string;
   };
 }
 

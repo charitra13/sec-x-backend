@@ -18,6 +18,7 @@ export interface JwtPayload {
   id: string;
   role: JwtRole;
   email?: string;
+  username: string;
 }
 
 export const generateToken = (payload: JwtPayload): string => {
