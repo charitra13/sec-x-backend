@@ -1,7 +1,10 @@
+// Load environment variables FIRST before any other imports
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Application, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -22,6 +25,7 @@ import corsDebugRoutes from './routes/corsDebug.routes';
 import uploadRoutes from './routes/upload.routes';
 import originManagementRoutes from './routes/originManagement.routes';
 import corsDocumentationRoutes from './routes/corsDocumentation.routes';
+import contactRoutes from './routes/contact.routes';
 import { corsOptions } from './config/cors.config';
 import { selfWarmingService } from './services/warmingService';
 import { warmingMiddleware } from './middleware/warmingMiddleware';
@@ -34,10 +38,6 @@ import { smartCORSLimiter } from './middleware/rateLimiter';
 import { corsErrorHandler } from './middleware/corsError.middleware';
 import { validateOriginRequest, blockSuspiciousOrigins } from './middleware/originValidation.middleware';
 import { securityHeaders } from './middleware/security.middleware';
-
-
-// Load environment variables
-dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 8080;
@@ -87,6 +87,7 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/contacts', contactRoutes);
 app.use('/api/cors-debug', corsDebugRoutes);
 app.use('/api/admin/origins', originManagementRoutes);
 app.use('/api/cors', corsDocumentationRoutes);

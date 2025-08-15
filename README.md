@@ -95,6 +95,7 @@ The API includes endpoints for authentication, user management, blog posts, and 
 - `/api/users` - User management
 - `/api/blogs` - Blog post operations
 - `/api/comments` - Comment management
+- `/api/contacts` - Contact form submissions and management
 - `/api/health` - Health check
 
 ## 🔐 HTTPS Development
@@ -260,7 +261,58 @@ This project is continuously evolving. The next phase of development will focus 
 - Email integration
 - Testing
 
+### 📞 Contact Form API
+
+The backend now supports a comprehensive contact form submission system with the following features:
+
+#### Contact Form Endpoints:
+- `POST /api/contacts` - Submit contact form (public, rate-limited)
+- `GET /api/contacts` - List all contacts with filtering (admin only)
+- `GET /api/contacts/analytics` - Contact analytics (admin only)
+- `GET /api/contacts/:id` - Get specific contact (admin only)
+- `PUT /api/contacts/:id` - Update contact status/notes (admin only)
+- `DELETE /api/contacts/:id` - Delete contact (admin only)
+
+#### Contact Form Features:
+- **Rate Limiting**: 3 submissions per IP per 15 minutes
+- **Validation**: Comprehensive input validation with express-validator
+- **Admin Management**: Full CRUD operations for contact management
+- **Analytics**: Daily submission tracking and status distribution
+- **Status Management**: New, In-Progress, Resolved, Closed statuses
+- **Priority System**: Auto-assigned based on service type (Low, Medium, High, Urgent)
+- **Service Types**: Red-teaming, Penetration-testing, AI-security, Compliance-audit, Incident-response, Security-training, Other
+- **Form Types**: Contact and Assessment forms
+- **Metadata Tracking**: IP address, user agent, source tracking
+- **Search & Filter**: Search by name, email, company, message with status/priority filters
+
+#### Contact Form Schema:
+```json
+{
+  "name": "Required, 2-100 characters",
+  "email": "Required, valid email format",
+  "company": "Optional, max 150 characters",
+  "phone": "Optional, max 20 characters",
+  "countryCode": "Required, max 5 characters",
+  "serviceType": "Optional, enum values",
+  "message": "Required, 10-2000 characters",
+  "formType": "Optional, 'contact' or 'assessment'"
+}
+```
+
 ## 📝 Changelog
+
+### v1.2.7 (2024-12-20)
+
+- **Feat**: Implemented comprehensive contact form backend system
+- **Feat**: Added Contact model with Mongoose schema for form submissions
+- **Feat**: Created Contact controller with full CRUD operations and analytics
+- **Feat**: Implemented contact form validation with express-validator
+- **Feat**: Added rate limiting specifically for contact form submissions (3 per 15 minutes per IP)
+- **Feat**: Created contact routes with public submission endpoint and protected admin management
+- **Feat**: Added contact analytics with daily submission tracking and status distribution
+- **Security**: Contact form includes IP address and user agent tracking for security monitoring
+- **Admin**: Complete contact management system with status tracking, priority assignment, and notes
+- **Integration**: Integrated contact routes into main application with `/api/contacts` endpoint
 
 ### v1.2.6 (2025-08-09)
 
